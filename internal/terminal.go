@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/mgr"
 )
@@ -62,6 +63,7 @@ func (w *WindowsTerminal) CleanAgent(path string) error {
 	for _, value := range dirEntry {
 		name := value.Name()
 		dirPath := path + "\\" + name
+		log.Info().Msg("Remove : " + dirPath)
 		if !isExcludedName(name) {
 			err = os.RemoveAll(dirPath)
 		}
@@ -75,6 +77,7 @@ func (w *WindowsTerminal) CleanAgent(path string) error {
 }
 
 func (w *WindowsTerminal) ShutdownAgent(agentName string) error {
+	log.Info().Msg("Shutdown : " + agentName)
 	service, err := w.m.OpenService(agentName)
 	if err != nil {
 		return err
@@ -89,7 +92,7 @@ func (w *WindowsTerminal) ShutdownAgent(agentName string) error {
 }
 
 func (w *WindowsTerminal) StartAgent(agentName string) error {
-
+	log.Info().Msg("Start : " + agentName)
 	service, err := w.m.OpenService(agentName)
 	if err != nil {
 		return err

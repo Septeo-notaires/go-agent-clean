@@ -25,8 +25,6 @@ func init() {
 }
 
 func main() {
-	log.Print("Clean Agent Hebdo")
-
 	factory := internal.NewTerminalFactory(internal.Windows)
 	term := factory.NewTerminal()
 
@@ -36,16 +34,20 @@ func main() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+
 			if err := term.ShutdownAgent(agent.Service); err != nil {
 				log.Err(err).Stack().Msg("shutdown " + agent.Name)
+				return
 			}
 
 			if err := term.CleanAgent(agent.Path); err != nil {
 				log.Err(err).Stack().Msg("clear " + agent.Name)
+				return
 			}
 
 			if err := term.StartAgent(agent.Service); err != nil {
 				log.Err(err).Stack().Msg("start " + agent.Name)
+				return
 			}
 		}()
 	}
