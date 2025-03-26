@@ -1,0 +1,89 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"  # Déclenche le workflow sur un push de tag (ex: v1.0.0)
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }} for ${{ matrix.goos }}-${{ matrix.goarch }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, linux-latest]
+        include:
+          - os: windows-latest
+            goos: windows
+            goarch: 386
+            ext: .exe
+          - os: windows-latest
+            goos: windows
+            goarch: amd64
+            ext: .exe
+          - os: linux-latest
+            goos: linux
+            goarch: amd64
+            ext: ""
+          - os: linux-latest
+            goos: linux
+            goarch: 386
+            ext: ""
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build
+        run: |
+          go env
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./cmd/main.go
+      
+      - name: Archive artifact (Linux)
+        if: runner.os == 'Linux'
+        run: tar -czvf clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz clean-agent-${{ matrix.goos }}-${{ matrix.goarch }} config.toml
+
+      - name: Archive artifact (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Compress-Archive -Path clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}, config.toml -DestinationPath clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}.zip
+        shell: powershell
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-binaries
+          path: |
+            clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+            clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}.zip
+          if-no-files-found: ignore
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: built-binaries
+          path: .
+
+      - name: List downloaded files (Debug)
+        run: ls -lh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            clean-agent-*.tar.gz
+            clean-agent-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
