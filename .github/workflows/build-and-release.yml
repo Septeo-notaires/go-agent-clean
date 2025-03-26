@@ -44,8 +44,8 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           go env
-          $env:GOOS=${{ matrix.goos }} 
-          $env:GOARCH=${{ matrix.goarch }} 
+          $env:GOOS="${{ matrix.goos }}"
+          $env:GOARCH="${{ matrix.goarch }}" 
           go build -o clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./cmd/main.go
 
       - name: Build (Linux)
