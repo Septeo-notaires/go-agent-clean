@@ -16,19 +16,11 @@ jobs:
         include:
           - os: windows-latest
             goos: windows
-            goarch: 386
-            ext: .exe
-          - os: windows-latest
-            goos: windows
             goarch: amd64
             ext: .exe
-          - os: linux-latest
+          - os: ubuntu-latest
             goos: linux
             goarch: amd64
-            ext: ""
-          - os: linux-latest
-            goos: linux
-            goarch: 386
             ext: ""
 
     steps:
