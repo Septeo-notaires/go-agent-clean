@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest, linux-latest]
+        os: [windows-latest, ubuntu-latest]
         include:
           - os: windows-latest
             goos: windows
@@ -59,7 +59,7 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: built-binaries
+          name: built-binaries-${{ matrix.goos }}
           path: |
             clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
             clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}.zip
@@ -71,10 +71,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download build artifacts
+      - name: Download windows build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: built-binaries
+          name: built-binaries-windows
+          path: .
+          
+      - name: Download linux build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: built-binaries-linux
           path: .
 
       - name: List downloaded files (Debug)
