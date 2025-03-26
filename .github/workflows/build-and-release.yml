@@ -53,6 +53,7 @@ jobs:
         run: |
           go env
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./cmd/main.go
+          
       - name: Archive artifact (Linux)
         if: runner.os == 'Linux'
         run: tar -czvf clean-agent-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz clean-agent-${{ matrix.goos }}-${{ matrix.goarch }} config.toml
