@@ -22,7 +22,8 @@ func NewTerminalFactory(interpreterName string, osType OsType) TerminalFactory {
 func (t *TerminalFactory) NewTerminal() ITerminal {
 	switch t.osType {
 	case Windows:
-		return &WindowsTerminal{}
+		term := NewWindowTerminal()
+		return &term
 	case Linux:
 		return &LinuxTerminal{}
 	default:
