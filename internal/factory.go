@@ -1,21 +1,21 @@
 package internal
 
-type OsType int
+type (
+	OsType int
+
+	TerminalFactory struct {
+		osType OsType
+	}
+)
 
 const (
 	Linux OsType = iota
 	Windows
 )
 
-type TerminalFactory struct {
-	osType          OsType
-	interpreterName string
-}
-
-func NewTerminalFactory(interpreterName string, osType OsType) TerminalFactory {
+func NewTerminalFactory(osType OsType) TerminalFactory {
 	return TerminalFactory{
-		osType:          osType,
-		interpreterName: interpreterName,
+		osType: osType,
 	}
 }
 

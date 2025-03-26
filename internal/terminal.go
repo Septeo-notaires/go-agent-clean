@@ -17,18 +17,20 @@ var excludePath []string = []string{
 	"SourceRootMapping",
 }
 
-type ITerminal interface {
-	CleanAgent(path string) error
-	ShutdownAgent(agentName string) error
-	StartAgent(agentName string) error
-}
+type (
+	ITerminal interface {
+		CleanAgent(path string) error
+		ShutdownAgent(agentName string) error
+		StartAgent(agentName string) error
+	}
 
-type WindowsTerminal struct {
-	m *mgr.Mgr
-}
+	WindowsTerminal struct {
+		m *mgr.Mgr
+	}
 
-type LinuxTerminal struct {
-}
+	LinuxTerminal struct {
+	}
+)
 
 // Windows Terminal
 
@@ -61,7 +63,7 @@ func (w *WindowsTerminal) CleanAgent(path string) error {
 		name := value.Name()
 		dirPath := path + "\\" + name
 		if !isExcludedName(name) {
-			err = os.Remove(dirPath)
+			err = os.RemoveAll(dirPath)
 		}
 
 		if err != nil {
