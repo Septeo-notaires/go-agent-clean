@@ -1,4 +1,4 @@
-package internal
+package toml
 
 import (
 	"errors"
