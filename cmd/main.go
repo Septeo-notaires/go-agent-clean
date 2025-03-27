@@ -3,14 +3,16 @@ package main
 import (
 	"bufio"
 	"os"
+	"runtime"
 	"sync"
 
-	"github.com/go-agent-clean/internal"
+	"github.com/go-agent-clean/internal/terminal"
+	"github.com/go-agent-clean/internal/toml"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-var conf internal.Config
+var conf toml.Config
 
 func init() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -20,12 +22,23 @@ func init() {
 		defer file.Close()
 		reader := bufio.NewReader(file)
 		blob, _ := reader.ReadString(0)
-		conf = internal.DecodeFile(blob)
+		conf = toml.DecodeFile(blob)
 	}
 }
 
 func main() {
-	factory := internal.NewTerminalFactory(internal.Windows)
+	var operatingSystem terminal.OsType
+
+	if runtime.GOOS == "windows" {
+		operatingSystem = terminal.Windows
+	} else if runtime.GOOS == "linux" {
+		operatingSystem = terminal.Linux
+	} else {
+		log.Error().Msg("Operating System not compatible")
+		os.Exit(-1)
+	}
+
+	factory := terminal.NewTerminalFactory(operatingSystem)
 	term := factory.NewTerminal()
 
 	wg := sync.WaitGroup{}
